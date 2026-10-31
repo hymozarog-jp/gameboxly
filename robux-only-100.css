@@ -86,3 +86,90 @@
 @media(prefers-reduced-motion:reduce){
   #robuxModal.robux-single-offer .robux-package{transition:none!important}
 }
+
+/* The actual Robux illustration: prominently fill the formerly empty card. */
+#robuxModal.robux-single-offer .package-grid>.robux-package{
+  aspect-ratio:.89!important;
+  min-height:320px!important;
+  isolation:isolate;
+  background:linear-gradient(160deg,#9db4e4 0%,#5666a4 40%,#171a3d 69%,#0c142c 100%)!important;
+}
+#robuxModal.robux-single-offer .package-grid>.robux-package::before{
+  inset:0!important;
+  z-index:0!important;
+  background:
+    radial-gradient(ellipse at 51% 36%,#c7c4ff70 0%,#847ad141 35%,transparent 67%),
+    linear-gradient(180deg,#fff2 0%,transparent 55%)!important;
+}
+#robuxModal.robux-single-offer .package-grid>.robux-package>.robux-display-art{
+  position:absolute!important;
+  display:block!important;
+  top:12%!important;
+  left:2%!important;
+  right:2%!important;
+  bottom:auto!important;
+  width:96%!important;
+  height:55%!important;
+  object-fit:contain!important;
+  max-width:none!important;
+  max-height:none!important;
+  margin:0!important;
+  padding:0!important;
+  border:0!important;
+  z-index:3!important;
+  opacity:1!important;
+  visibility:visible!important;
+  pointer-events:none;
+  filter:drop-shadow(0 16px 15px #0a1037a3);
+  animation:gbRobuxFloat 4.4s ease-in-out infinite;
+}
+#robuxModal.robux-single-offer .package-grid>.robux-package>.robux-art{
+  position:absolute!important;
+  top:13px!important;
+  right:13px!important;
+  left:auto!important;
+  width:47px!important;
+  height:47px!important;
+  transform:none!important;
+  z-index:5!important;
+  border-radius:13px!important;
+  background:#394878!important;
+  border:2px solid #ced5ff77!important;
+  box-shadow:0 6px 15px #10163199!important;
+}
+#robuxModal.robux-single-offer .package-grid>.robux-package>.robux-art>img{
+  display:block!important;width:100%!important;height:100%!important;
+  object-fit:contain!important;
+}
+#robuxModal.robux-single-offer .package-grid>.robux-package>.robux-plus{
+  z-index:5!important;
+}
+#robuxModal.robux-single-offer .package-grid>.robux-package>span:not(.robux-art):not(.robux-plus){
+  position:relative!important;
+  z-index:4!important;
+  min-height:0!important;
+  justify-content:flex-end!important;
+  padding:205px 16px 18px!important;
+  background:linear-gradient(180deg,transparent 0%,#0c12306b 35%,#0b1229eb 72%,#0a1124 100%)!important;
+}
+#robuxModal.robux-single-offer .package-grid>.robux-package strong{
+  text-shadow:0 2px 8px #080b1b9e;
+}
+@keyframes gbRobuxFloat{
+  0%,100%{transform:translateY(0)}
+  50%{transform:translateY(-5px)}
+}
+@media(max-width:500px){
+  #robuxModal.robux-single-offer .package-grid>.robux-package{
+    min-height:302px!important;aspect-ratio:.89!important;
+  }
+  #robuxModal.robux-single-offer .package-grid>.robux-package>span:not(.robux-art):not(.robux-plus){
+    padding:185px 14px 16px!important;
+  }
+  #robuxModal.robux-single-offer .package-grid>.robux-package>.robux-art{
+    width:42px!important;height:42px!important;
+  }
+}
+@media(prefers-reduced-motion:reduce){
+  #robuxModal.robux-single-offer .package-grid>.robux-package>.robux-display-art{animation:none!important}
+}
