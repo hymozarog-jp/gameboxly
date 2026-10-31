@@ -1,6 +1,6 @@
 (function(){
   var s=document.createElement('script');
-  s.src='legacy-app.js?v=header-logo-sync-3&purchase-notify=1&whatsapp-help=1&pubg-uc60=1&pubg-picture=1&subscriptions-nav=1';
+  s.src='legacy-app.js?v=robux-only100-1&purchase-notify=1&whatsapp-help=1&pubg-uc60=1&pubg-picture=1&subscriptions-nav=1';
   s.onerror=function(){console.error('تعذر تحميل وظائف المتجر')};
   s.onload=function(){
     var auto=document.createElement('script');
