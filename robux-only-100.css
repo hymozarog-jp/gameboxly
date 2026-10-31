@@ -1,0 +1,88 @@
+/* GAMEBOXLY — one 100-Robux package. Keep the existing purchase and stock handlers. */
+#robuxModal.robux-single-offer .robux-reference-hero{
+  min-height:260px!important;
+  padding-top:max(55px,calc(46px + env(safe-area-inset-top,0px)))!important;
+  padding-bottom:18px!important;
+  background:radial-gradient(ellipse at 50% 0%,#6144ac77 0%,#1b2140 40%,#0b1020 86%)!important;
+}
+#robuxModal.robux-single-offer .robux-reference-logo{
+  width:92px!important;height:92px!important;
+  border-radius:23px!important;
+  box-shadow:0 10px 32px #080c218c,0 0 0 5px #a996fb17!important;
+}
+#robuxModal.robux-single-offer .robux-reference-hero h1{
+  font-size:clamp(27px,6vw,34px)!important;
+  margin:10px 0!important;
+}
+#robuxModal.robux-single-offer .robux-reference-section{
+  text-align:center!important;
+  font-size:clamp(21px,5vw,26px)!important;
+  margin:16px auto 7px!important;
+}
+#robuxModal.robux-single-offer .robux-packages-help{
+  text-align:center!important;
+  max-width:380px;
+  color:#b7bedc!important;
+  margin:0 auto 17px!important;
+  font-size:12px!important;
+}
+#robuxModal.robux-single-offer .robux-quantity-calculator{display:none!important}
+#robuxModal.robux-single-offer .package-grid{
+  display:grid!important;
+  grid-template-columns:minmax(0,1fr)!important;
+  width:min(100%,315px)!important;
+  max-width:315px!important;
+  justify-items:stretch!important;
+  justify-content:center!important;
+  margin:0 auto 24px!important;
+  gap:0!important;
+}
+#robuxModal.robux-single-offer .package-grid>.robux-package{
+  width:100%!important;
+  max-width:none!important;
+  margin:0 auto!important;
+  min-height:0!important;
+  aspect-ratio:.98!important;
+  border:2px solid #9d8efa8f!important;
+  border-radius:24px!important;
+  background:linear-gradient(180deg,#b9d9f6 0%,#567ab7 43%,#0e172f 67%)!important;
+  box-shadow:0 20px 36px #0008,0 0 0 4px #ab97ff0b,inset 0 1px #fff4!important;
+  transition:transform .2s ease,border-color .2s ease!important;
+}
+#robuxModal.robux-single-offer .package-grid>.robux-package:not(:disabled):hover{
+  transform:translateY(-3px)!important;
+  border-color:#b5a9ff!important;
+}
+#robuxModal.robux-single-offer .package-grid>.robux-package.selected{
+  border-color:#c0b4ff!important;
+  box-shadow:0 0 0 3px #9387ff35,0 22px 45px #0009!important;
+}
+#robuxModal.robux-single-offer .package-grid>.robux-package strong{
+  font-size:clamp(19px,5vw,24px)!important;
+}
+#robuxModal.robux-single-offer .package-grid>.robux-package small:not(.stock-label){
+  background:#2f275c!important;
+  color:#e2d7ff!important;
+  font-size:clamp(17px,4vw,21px)!important;
+  border:1px solid #9881e65e!important;
+}
+#robuxModal.robux-single-offer .package-grid>.robux-package .stock-label{
+  color:#c5cde5!important;
+  font-size:11px!important;
+}
+@media(max-width:500px){
+  #robuxModal.robux-single-offer .robux-reference-hero{min-height:235px!important}
+  #robuxModal.robux-single-offer .robux-reference-logo{width:80px!important;height:80px!important}
+  #robuxModal.robux-single-offer .package-grid{
+    width:min(100%,270px)!important;max-width:270px!important;
+  }
+  #robuxModal.robux-single-offer .package-grid>.robux-package{
+    aspect-ratio:1!important;border-radius:20px!important;
+  }
+  #robuxModal.robux-single-offer .robux-reference-features{
+    margin-bottom:14px!important;
+  }
+}
+@media(prefers-reduced-motion:reduce){
+  #robuxModal.robux-single-offer .robux-package{transition:none!important}
+}
