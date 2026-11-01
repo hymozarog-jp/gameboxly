@@ -66,7 +66,7 @@
       +'<span class="sab-card-label">'+escapeHtml(item.latin)+'</span>'
       +'<h3>'+escapeHtml(item.name)+'</h3>'
       +'<div class="sab-card-footer"><strong>'+priceText(product)+'</strong>'
-      +(available?'<button type="button" class="sab-buy" data-steal-buy="'+escapeHtml(item.key)+'">اطلب الآن</button>'
+      +(available?'<button type="button" class="sab-buy" data-steal-buy="'+escapeHtml(item.key)+'">فتح القائمة</button>'
         :'<span class="sab-unavailable">قريبًا</span>')
       +'</div></article>';
   }
