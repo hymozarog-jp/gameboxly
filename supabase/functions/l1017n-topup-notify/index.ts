@@ -26,6 +26,12 @@ Deno.serve(async(req:Request)=>{
  if(readError)return answer({error:"read_failed"},500);
  if(!r||r.user_id!==auth.user.id)return answer({error:"not_found"},404);
  if(r.status!=="pending")return answer({error:"already_reviewed"},409);
+ // For Libyana USSD: the customer's intent is not evidence of a transfer.
+ // The signed SMS receiver sends the actual review notification once it arrives,
+ // with the receipt number, account name and one-time approval buttons.
+ if(r.method==="libyana"&&String(r.transfer_reference||"").startsWith("ussd-intent:")){
+   return answer({ok:true,payment_pending:true,notice:"sent_after_sms_receipt"});
+ }
  if(Date.now()-new Date(r.created_at).getTime()>60*60*1000)return answer({error:"request_too_old"},409);
  if(r.telegram_notified_at)return answer({ok:true,already_sent:true});
  const now=new Date().toISOString();
