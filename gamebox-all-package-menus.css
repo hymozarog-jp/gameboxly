@@ -1,0 +1,138 @@
+/* Shared GAMEBOXLY package menu: Robux, MM2, Brainrot, PUBG and digital codes. */
+html{--gb-menu-bg:#0b1020;--gb-menu-card:#181e39;--gb-menu-border:#7465ad;--gb-menu-accent:#8265df}
+#rgpMm2Checkout.gb-package-dialog,
+#sabCheckout.gb-package-dialog,
+#pubgAccountCheckoutOverlay.gb-package-dialog{
+  position:fixed!important;inset:0!important;z-index:2147483500!important;
+  display:block!important;overflow-x:hidden!important;overflow-y:auto!important;
+  overscroll-behavior:contain!important;
+  padding:0!important;box-sizing:border-box!important;
+  background:radial-gradient(ellipse at 55% 0%,#463268 0%,#192038 30%,#0a1020 80%)!important;
+  direction:rtl!important;color:#f9f7ff!important;
+}
+#rgpMm2Checkout.gb-package-dialog .mm2-checkout-box,
+#sabCheckout.gb-package-dialog .sab-dialog,
+#pubgAccountCheckoutOverlay.gb-package-dialog .pubg-account-checkout{
+  width:min(100%,640px)!important;max-width:640px!important;
+  min-height:100dvh!important;box-sizing:border-box!important;
+  border:0!important;border-radius:0!important;box-shadow:none!important;
+  padding:calc(19px + env(safe-area-inset-top,0px)) 19px calc(48px + env(safe-area-inset-bottom,0px))!important;
+  margin:0 auto!important;
+  background:transparent!important;color:#fff!important;
+  animation:gbPackageMenuIn .22s ease both;
+}
+.gb-package-dialog .gb-package-top,
+#gbCodePurchaseConfirm .gb-package-top{
+  display:flex!important;justify-content:space-between;align-items:center;
+  gap:10px;min-height:48px;margin:0 0 25px;
+}
+.gb-package-dialog .gb-package-back,
+#gbCodePurchaseConfirm .gb-package-back{
+  border:1px solid #9283cb80!important;border-radius:13px!important;
+  color:#fff!important;background:#272345!important;
+  min-height:43px;padding:9px 14px!important;
+  font:700 13px/1.5 "IBM Plex Sans Arabic",system-ui,sans-serif!important;
+  cursor:pointer;
+}
+.gb-package-dialog .gb-package-brand,
+#gbCodePurchaseConfirm .gb-package-brand{
+  direction:ltr;font:750 11px/1.5 system-ui,sans-serif;
+  letter-spacing:.25px;color:#c8b3ff;text-align:left;
+}
+.gb-package-dialog .gb-package-preamble{
+  color:#b8c1dc!important;font-size:13px!important;line-height:1.8!important;margin:0 0 19px!important;
+}
+#rgpMm2Checkout.gb-package-dialog .mm2-checkout-box>img{
+  height:185px!important;max-height:185px!important;width:100%!important;
+  object-fit:contain!important;background:linear-gradient(150deg,#34355d,#192041)!important;
+  border-radius:18px!important;margin:0 0 10px!important;
+}
+#sabCheckout.gb-package-dialog .sab-dialog-close,
+#pubgAccountCheckoutOverlay.gb-package-dialog .pubg-account-close{display:none!important}
+#rgpMm2Checkout.gb-package-dialog h2,
+#sabCheckout.gb-package-dialog h2,
+#pubgAccountCheckoutOverlay.gb-package-dialog h2{
+  font-size:clamp(22px,5vw,29px)!important;line-height:1.45!important;color:#fff!important;
+}
+#rgpMm2Checkout.gb-package-dialog form,
+#sabCheckout.gb-package-dialog form,
+#pubgAccountCheckoutOverlay.gb-package-dialog form{
+  background:var(--gb-menu-card)!important;
+  border:1px solid #7465ad8a!important;border-radius:20px!important;
+  padding:20px 16px!important;
+}
+.gb-package-dialog input:not([type="checkbox"]){
+  min-height:49px!important;border-radius:13px!important;
+  color:#fff!important;background:#0e1630!important;
+  border:1px solid #666496!important;
+  max-width:100%!important;box-sizing:border-box!important;
+}
+.gb-package-dialog [type="submit"]{
+  min-height:48px!important;border-radius:13px!important;
+  background:linear-gradient(110deg,#886bea,#6555c8)!important;
+  color:#fff!important;font-weight:800!important;
+}
+.sab-item-card.sab-available.gb-card-prepared,
+.pubg-pack.gb-card-prepared,
+.ll-card.gb-card-prepared{cursor:pointer}
+.sab-item-card.sab-available.gb-card-prepared:focus-visible,
+.pubg-pack.gb-card-prepared:focus-visible,
+.ll-card.gb-card-prepared:focus-visible{
+  outline:3px solid #b7a0ff!important;outline-offset:3px!important;
+}
+.sab-item-card.sab-available:hover,.pubg-pack.gb-card-prepared:hover,.ll-card.gb-card-prepared:hover{
+  border-color:#a99bfc!important;box-shadow:0 12px 29px #0006!important;
+}
+.sab-item-card .sab-buy,.pubg-pack .pubg-buy,.ll-card .ll-quickbuy{
+  background:linear-gradient(110deg,#8265df,#6553c7)!important;
+  color:#fff!important;
+}
+#gbCodePurchaseConfirm{
+  position:fixed;z-index:2147483505;inset:0;overflow-y:auto;
+  direction:rtl;padding:0 14px;box-sizing:border-box;color:#fff;
+  background:radial-gradient(ellipse at 50% 0%,#48366f,#161e38 36%,#090e20 87%);
+}
+#gbCodePurchaseConfirm .gb-code-shell{
+  max-width:600px;margin:0 auto;min-height:100dvh;
+  padding:calc(18px + env(safe-area-inset-top,0px)) 0 calc(35px + env(safe-area-inset-bottom,0px));
+  box-sizing:border-box;display:flex;flex-direction:column;gap:15px;
+}
+#gbCodePurchaseConfirm .gb-code-heading{
+  display:flex;align-items:center;gap:15px;padding:12px 0;
+}
+#gbCodePurchaseConfirm .gb-code-art{
+  width:76px;height:76px;flex:none;display:grid;place-items:center;
+  background:#373264;border:1px solid #a18ee29e;border-radius:20px;
+  font:900 27px system-ui,sans-serif;color:#e3d6ff;
+}
+#gbCodePurchaseConfirm h2{font-size:clamp(23px,5vw,29px);line-height:1.5;margin:0}
+#gbCodePurchaseConfirm .gb-code-description{color:#bfc7e0;font-size:13px;line-height:1.85;margin:0}
+#gbCodePurchaseConfirm .gb-code-summary{
+  display:flex;align-items:center;justify-content:space-between;gap:12px;
+  padding:19px;border-radius:18px;border:1px solid #7869b7;
+  background:#1a2140;color:#fff;
+}
+#gbCodePurchaseConfirm .gb-code-summary strong{font-size:16px}
+#gbCodePurchaseConfirm .gb-code-summary span{font-weight:850;color:#e3d9ff;font-size:20px;white-space:nowrap}
+#gbCodePurchaseConfirm .gb-code-note{
+  background:#191d35;border-radius:17px;padding:18px;color:#ccd3e5;line-height:1.9;
+}
+#gbCodePurchaseConfirm .gb-code-actions{margin-top:12px;display:grid;grid-template-columns:1fr 1fr;gap:10px}
+#gbCodePurchaseConfirm .gb-code-actions button{
+  border-radius:14px;min-height:53px;cursor:pointer;border:1px solid #7a71aa;
+  font:800 14px "IBM Plex Sans Arabic",system-ui,sans-serif;color:#fff;background:#242b4e;
+}
+#gbCodePurchaseConfirm .gb-code-actions .gb-code-approve{
+  border:0;background:linear-gradient(110deg,#8769eb,#6757c8);
+}
+@keyframes gbPackageMenuIn{from{opacity:.4;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+@media(max-width:450px){
+ .gb-package-dialog .gb-package-top,#gbCodePurchaseConfirm .gb-package-top{margin-bottom:18px}
+ #rgpMm2Checkout.gb-package-dialog .mm2-checkout-box,
+ #sabCheckout.gb-package-dialog .sab-dialog,
+ #pubgAccountCheckoutOverlay.gb-package-dialog .pubg-account-checkout{
+   padding-inline:15px!important;
+ }
+}
+@media(prefers-reduced-motion:reduce){.gb-package-dialog .mm2-checkout-box,.gb-package-dialog .sab-dialog,
+.gb-package-dialog .pubg-account-checkout{animation:none!important}}
