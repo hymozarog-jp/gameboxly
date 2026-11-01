@@ -95,7 +95,7 @@
       + '<div class="pubg-pack-bottom"><div class="pubg-price"><small>السعر</small><strong>' + priceText + ' <span>د.ل</span></strong></div>'
       + (noCodeAvailable
         ? '<button type="button" class="pubg-buy" disabled aria-label="كود 60 UC غير متوفر حاليًا">غير متوفر</button>'
-        : '<button type="button" class="pubg-buy" data-pubg-buy="' + safe(product.id) + '" aria-label="شراء ' + name + '">' + (isVoucher ? "شراء الكود" : "نشحنها لك") + ' <span aria-hidden="true">←</span></button>') + '</div>'
+        : '<button type="button" class="pubg-buy" data-pubg-buy="' + safe(product.id) + '" aria-label="شراء ' + name + '">' + "فتح القائمة" + ' <span aria-hidden="true">←</span></button>') + '</div>'
       + '</article>';
   }
   // PUBG UC is manually fulfilled to the player's ID; never deliver a test code.
