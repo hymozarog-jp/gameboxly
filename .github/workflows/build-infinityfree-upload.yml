@@ -1,0 +1,41 @@
+name: Prepare InfinityFree upload package
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/build-infinityfree-upload.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  package:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Package only web files for InfinityFree htdocs
+        run: |
+          set -euo pipefail
+          mkdir -p "infinityfree-upload/game-covers"
+          find . -maxdepth 1 -type f \( -name '*.js' -o -name '*.css' -o -name '*.html' \) ! -name '404.html' -exec cp -- '{}' infinityfree-upload/ \;
+          cp -a game-covers/. infinityfree-upload/game-covers/
+          test -s infinityfree-upload/index.html
+          test -s infinityfree-upload/app.js
+          test -s infinityfree-upload/legacy-app.js
+          test -s infinityfree-upload/auto-topup.js
+          test -s infinityfree-upload/styles.css
+          find infinityfree-upload -type f | sort
+          echo "Package bytes: $(du -sb infinityfree-upload | cut -f1)"
+          if [ "$(du -sb infinityfree-upload | cut -f1)" -ge 9500000 ]; then
+            echo "Website package too big for InfinityFree upload"
+            exit 1
+          fi
+      - name: Publish ZIP with website files directly at archive root
+        uses: actions/upload-artifact@v4
+        with:
+          name: L1017n-InfinityFree-htdocs
+          path: infinityfree-upload/
+          include-hidden-files: false
+          retention-days: 30
