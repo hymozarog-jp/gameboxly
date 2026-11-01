@@ -194,7 +194,7 @@
           (available?' data-mm2-id="'+escapeHtml(x.id)+'"':' disabled aria-disabled="true"')+'>'+art+
           '<strong>'+escapeHtml(x.name)+'</strong>'+
           '<span class="mm2-price">'+Number(x.price||0).toFixed(2)+' د.ل</span>'+
-          '<small class="mm2-delivery">'+(available?'الكمية المتوفرة: 1 · التسليم داخل اللعبة':'غير متوفر حاليًا · نفدت الكمية')+'</small></button>';
+          '<small class="mm2-delivery">'+(available?'الكمية المتوفرة: 1 · التسليم داخل اللعبة':'غير متوفر حاليًا · نفدت الكمية')+'</small>'+(available?'<span class="gb-card-open">فتح القائمة ←</span>':'')+'</button>';
       }).join('');
       grid.addEventListener('click',function(e){
         var b=e.target.closest('[data-mm2-id]');if(!b)return;
