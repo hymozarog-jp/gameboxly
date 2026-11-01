@@ -72,6 +72,15 @@ html{--gb-menu-bg:#0b1020;--gb-menu-card:#181e39;--gb-menu-border:#7465ad;--gb-m
   background:linear-gradient(110deg,#886bea,#6555c8)!important;
   color:#fff!important;font-weight:800!important;
 }
+#robloxGamePage .rgp-package .gb-card-open{
+  display:inline-flex!important;align-items:center;justify-content:center;
+  align-self:flex-start;margin-top:12px;padding:9px 15px;
+  border:1px solid #9d88df75;border-radius:12px;
+  background:linear-gradient(115deg,#8262d7,#6652b9);
+  font-size:13px;font-weight:800;color:#fff;
+  white-space:nowrap;
+}
+#robloxGamePage .rgp-package:disabled .gb-card-open{display:none!important}
 .sab-item-card.sab-available.gb-card-prepared,
 .pubg-pack.gb-card-prepared,
 .ll-card.gb-card-prepared{cursor:pointer}
