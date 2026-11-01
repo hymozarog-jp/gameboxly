@@ -2,6 +2,7 @@
  * No sticky "متابعة" footer and no payment on card tap. */
 (function () {
   'use strict';
+  document.documentElement.classList.add('gb-robux-direct-menu');
   var busy=false;
   function openMenu(tile){
     if(busy||!tile||tile.disabled)return;
@@ -76,7 +77,7 @@
         if(event.key==='Escape'){event.preventDefault();close();}
       });
       document.body.appendChild(screen);
-      window.scrollTo({top:0,behavior:'instant'});
+      window.scrollTo({top:0,behavior:'auto'});
       back.focus({preventScroll:true});
     }).catch(function(err){
       console.warn('[robux/menu]',err);
