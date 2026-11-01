@@ -106,8 +106,13 @@
   <span class="madar-candy-status" role="note">شحن المدار قريبًا</span>
   <span class="wallet-candy-gain" role="status" aria-live="polite"></span>
 </div></div><div class="wallet-carousel-dots"><span class="active"></span><span></span></div><a class="wallet-madar-logo-credit" href="https://commons.wikimedia.org/wiki/File:Almadar_Aljadid_Logo.png" target="_blank" rel="noopener noreferrer">شعار المدار الجديد: ILibya10 · CC BY-SA 4.0 · مقتطع للبطاقة</a><div class="wallet-actions" aria-label="خيارات المحفظة"><button type="button" class="wallet-action" id="walletActionTopup"><span class="wallet-action-icon"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg></span><b>شحن</b></button><button type="button" class="wallet-action" id="walletActionTransfer"><span class="wallet-action-icon"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M7 7h14l-4-4M21 7l-4 4"/><path d="M17 17H3l4 4M3 17l4-4"/></svg></span><b>تحويل</b></button><button type="button" class="wallet-action" id="walletActionSend" aria-haspopup="dialog" aria-controls="walletSendSheet"><span class="wallet-action-icon"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="m22 2-7 20-4-9-9-4 20-7Z"/><path d="M22 2 11 13"/></svg></span><b>إرسال</b></button><button type="button" class="wallet-action" id="walletActionPrimary" aria-pressed="false" aria-label="تعيين المحفظة المعروضة كأساسية" title="الأساسية للمحفظة المعروضة"><span class="wallet-action-icon"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="m8 12 3 3 5-6"/></svg></span><b>اجعلها أساسية</b></button></div><div class="wallet-recent-head"><h3>آخر المعاملات</h3><div class="wallet-filter-tabs"><button type="button" class="active" data-wallet-filter="all">الكل</button><button type="button" data-wallet-filter="approved">إيداع</button><button type="button" data-wallet-filter="pending">معلق</button><button type="button" data-wallet-filter="rejected">مرفوض</button></div></div></div><div class="wallet-layout"><div class="panel balance-panel"><div class="balance-top"><span>الرصيد الحالي</span><span class="balance-icon">◈</span></div><div class="balance-amount"><strong id="balanceAmount">0.00</strong><span>د.ل</span></div><div class="balance-line"></div><div class="balance-foot"><span>الحساب</span><b id="walletUserState"><i></i> غير مسجل</b></div></div><div id="topupForm" class="panel topup-form" aria-label="شحن المحفظة من ليبيانا">
+  <nav class="tp-progress" aria-label="خطوات الشحن">
+    <button type="button" data-tp-step="1" aria-current="step"><b>1</b><span>المبلغ</span></button>
+    <i aria-hidden="true"></i><button type="button" data-tp-step="2"><b>2</b><span>رقم الهاتف</span></button>
+    <i aria-hidden="true"></i><button type="button" data-tp-step="3"><b>3</b><span>مراجعة</span></button>
+  </nav>
   <section class="tp-providers" aria-label="طريقة الشحن">
-    <h3>اختر طريقة الشحن</h3>
+    <button type="button" class="tp-change-provider" aria-expanded="false">تغيير ⇄</button>
     <div class="tp-provider-grid">
       <div class="tp-provider-card is-selected" aria-current="true"><span class="tp-provider-logo tp-libyana-logo">Li<span>♥</span></span><strong>ليبيانا</strong><small>رصيد خطك</small></div>
       <div class="tp-provider-card is-disabled" aria-label="المدار غير متاح حاليًا"><span class="tp-provider-logo tp-madar-logo">المدار</span><strong>المدار</strong><small>قريبًا</small></div>
@@ -118,7 +123,7 @@
     <span><b>1</b> اختار المبلغ</span><span><b>2</b> تأكد من رقمك</span><span><b>3</b> اضغط «متابعة»</span>
   </div>
   <section class="tp-panel tp-amount-panel">
-    <div class="tp-panel-heading"><h3><span class="tp-step-bubble">1</span> قيمة الشحن</h3><span>بالدينار الليبي</span></div>
+    <div class="tp-panel-heading"><h3><span class="tp-step-bubble" aria-hidden="true">◇</span> قيمة الشحن</h3><span>بالدينار الليبي</span></div>
     <label for="topupAmount" class="tp-visually-hidden">قيمة الشحن بالدينار</label>
     <input id="topupAmount" type="number" min="1" step="1" placeholder="اكتب القيمة بالدينار" inputmode="numeric" required aria-describedby="tpAmountHint">
     <div class="quick-amounts" aria-label="مبالغ الشحن السريعة">
@@ -131,7 +136,7 @@
     <p id="tpAmountHint" class="tp-small-note">اختار المبلغ اللي يناسبك. حدود التحويل الفعلية تعتمد على خدمة ليبيانا، والمبالغ الكبيرة قد تحتاج مراجعة قبل إضافة الرصيد.</p>
   </section>
   <section class="tp-panel tp-phone-panel">
-    <div class="tp-panel-heading"><h3><span class="tp-step-bubble">2</span> رقم الهاتف</h3></div>
+    <div class="tp-panel-heading"><h3><span class="tp-step-bubble" aria-hidden="true">⌕</span> رقم الهاتف</h3></div>
     <div class="tp-number-row"><span id="topupVerifiedNumber" dir="ltr" aria-live="polite">جاري التحقق…</span><span id="topupPhoneState" class="tp-phone-state">فحص التوثيق</span></div>
     <p class="tp-small-note">لازم التحويل يكون من نفس رقم ليبيانا الموثّق في حسابك عشان نقدر نطابق إشعار التحويل.</p>
   </section>
@@ -382,9 +387,9 @@ function openDedicatedTopup(e){
   var title=document.createElement('h2');title.className='topup-dedicated-title';title.textContent='شحن المحفظة';
   var marker=document.createComment('topup-form-original-position');form.parentNode.insertBefore(marker,form);
   var heading=document.createElement('div');heading.className='tp-dedicated-heading';heading.append(title,back);
-  var hero=document.createElement('div');hero.className='tp-neon-hero';
-  var heroCopy=document.createElement('div');heroCopy.className='tp-neon-copy';
-  var subtitle=document.createElement('p');subtitle.textContent='اختر طريقة الشحن';
+  var hero=document.createElement('div');hero.className='tp-clean-header';
+  var heroCopy=document.createElement('div');heroCopy.className='tp-clean-copy';
+  var subtitle=document.createElement('p');subtitle.textContent='أكمل الخطوات التالية';
   heroCopy.append(title,subtitle);hero.appendChild(heroCopy);
   page.append(heading,hero,form);document.body.appendChild(page);
   var walletLogo=document.querySelector('#walletView .libyana-brand-mark img');
@@ -652,7 +657,7 @@ document.addEventListener('click',function(e){var btn=e.target.closest('#madarWa
 <link rel="stylesheet" href="account-contact.css?v=compact-help1">
 <link rel="stylesheet" href="account-settings-fast.css?v=account-quick3&rank-identity-settings=1">
 <link rel="stylesheet" href="order-handover.css?v=manual-delivery2">
-<link rel="stylesheet" href="topup-reference.css?v=neon-purple-20261101">
+<link rel="stylesheet" href="topup-reference.css?v=steps-v3-20261101">
 <link rel="stylesheet" href="topup-return.css?v=verification-live2">
 <link rel="stylesheet" href="wallet-luxe.css?v=wallet-luxe3-candy15-v1">
 <link rel="stylesheet" href="wallet-transfer.css?v=internal-transfers1">
@@ -682,4 +687,19 @@ document.addEventListener('click',function(e){var btn=e.target.closest('#madarWa
 <script src="gamebox-all-package-menus.js?v=all-packs1"></script>
 <link rel="stylesheet" href="robux-direct-menu.css?v=open-menu2">
 <script src="robux-direct-menu.js?v=open-menu2"></script>
+<script>
+(function(){
+  const form=document.getElementById('topupForm');
+  if(!form)return;
+  const stages=form.querySelectorAll('[data-tp-step]');
+  function mark(n){stages.forEach(b=>{if(b.dataset.tpStep===String(n))b.setAttribute('aria-current','step');else b.removeAttribute('aria-current')})}
+  const targets={1:'.tp-amount-panel',2:'.tp-phone-panel',3:'#topupProceed'};
+  stages.forEach(b=>b.addEventListener('click',()=>{mark(b.dataset.tpStep);form.querySelector(targets[b.dataset.tpStep])?.scrollIntoView({block:'center',behavior:'smooth'})}));
+  form.querySelector('.tp-change-provider')?.addEventListener('click',function(){const expanded=this.getAttribute('aria-expanded')!=='true';this.setAttribute('aria-expanded',String(expanded));form.querySelector('.tp-providers').classList.toggle('is-expanded',expanded)});
+  form.addEventListener('input',e=>{if(e.target.id==='topupAmount')mark(1)});
+  form.addEventListener('click',e=>{if(e.target.closest('[data-amount]'))mark(1);else if(e.target.closest('.tp-phone-panel'))mark(2)});
+  const instructions=document.getElementById('transferInstructions');
+  new MutationObserver(()=>{if(instructions.querySelector('.auto-topup-transfer'))mark(3)}).observe(instructions,{childList:true,subtree:true});
+})();
+</script>
 </body></html>
