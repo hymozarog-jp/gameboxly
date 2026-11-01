@@ -42,6 +42,22 @@ jobs:
           name: Gameboxly-Android-test-only
           path: android/app/build/outputs/apk/debug/app-debug.apk
           if-no-files-found: error
+      # Owner can sign locally without ever uploading the private key to GitHub.
+      - name: Prepare unsigned release and apksigner for local signing
+        run: |
+          set -euo pipefail
+          export ANDROID_HOME=/usr/local/lib/android/sdk
+          mkdir -p signing-package
+          "$ANDROID_HOME/build-tools/35.0.0/zipalign" -f -p 4 \
+            app/build/outputs/apk/release/app-release-unsigned.apk \
+            signing-package/Gameboxly-aligned-unsigned.apk
+          cp "$ANDROID_HOME/build-tools/35.0.0/lib/apksigner.jar" signing-package/
+      - name: Upload unsigned release signing kit
+        uses: actions/upload-artifact@v4
+        with:
+          name: Gameboxly-unsigned-signing-kit
+          path: android/signing-package/
+          if-no-files-found: error
       # Public repositories must NEVER commit a release signing key.
       # After you set the three GitHub Actions secrets below, this step
       # signs the release APK with your persistent private certificate.
