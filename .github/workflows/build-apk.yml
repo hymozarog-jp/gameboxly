@@ -1,4 +1,4 @@
-name: Build L1017n APK
+name: Build Gameboxly Android APK
 
 on:
   push:
@@ -7,6 +7,9 @@ on:
       - 'android/**'
       - '.github/workflows/build-apk.yml'
   workflow_dispatch:
+
+permissions:
+  contents: read
 
 jobs:
   build:
@@ -20,7 +23,7 @@ jobs:
         with:
           distribution: temurin
           java-version: '17'
-      - name: Install Android SDK platform
+      - name: Install Android SDK
         working-directory: .
         run: |
           export ANDROID_HOME=/usr/local/lib/android/sdk
@@ -31,11 +34,41 @@ jobs:
         uses: gradle/actions/setup-gradle@v4
         with:
           gradle-version: '8.9'
-      - name: Build debug APK
-        run: gradle --no-daemon assembleDebug
-      - name: Publish APK artifact
+      - name: Build app for testing and release signing
+        run: gradle --no-daemon assembleDebug assembleRelease
+      - name: Upload testing APK
         uses: actions/upload-artifact@v4
         with:
-          name: L1017n-apk
+          name: Gameboxly-Android-test-only
           path: android/app/build/outputs/apk/debug/app-debug.apk
+          if-no-files-found: error
+      # Public repositories must NEVER commit a release signing key.
+      # After you set the three GitHub Actions secrets below, this step
+      # signs the release APK with your persistent private certificate.
+      - name: Sign publication APK
+        env:
+          RELEASE_KEYSTORE_B64: ${{ secrets.GAMEBOXLY_RELEASE_KEYSTORE_B64 }}
+          RELEASE_STORE_PASSWORD: ${{ secrets.GAMEBOXLY_RELEASE_STORE_PASSWORD }}
+          RELEASE_KEY_PASSWORD: ${{ secrets.GAMEBOXLY_RELEASE_KEY_PASSWORD }}
+        run: |
+          set -euo pipefail
+          if [[ -z "$RELEASE_KEYSTORE_B64" || -z "$RELEASE_STORE_PASSWORD" || -z "$RELEASE_KEY_PASSWORD" ]]; then
+            echo "Release-signing secrets missing. Only test APK is available; don't upload debug APK to APKPure."
+            exit 0
+          fi
+          export ANDROID_HOME=/usr/local/lib/android/sdk
+          export PATH="$ANDROID_HOME/build-tools/35.0.0:$PATH"
+          printf '%s' "$RELEASE_KEYSTORE_B64" | base64 --decode > "${RUNNER_TEMP}/gameboxly-release.jks"
+          zipalign -f -p 4 app/build/outputs/apk/release/app-release-unsigned.apk "${RUNNER_TEMP}/app-aligned.apk"
+          apksigner sign --ks "${RUNNER_TEMP}/gameboxly-release.jks" --ks-key-alias gameboxly \
+            --ks-pass env:RELEASE_STORE_PASSWORD --key-pass env:RELEASE_KEY_PASSWORD \
+            --out app/build/outputs/apk/release/Gameboxly-release.apk "${RUNNER_TEMP}/app-aligned.apk"
+          apksigner verify --verbose app/build/outputs/apk/release/Gameboxly-release.apk
+          rm -f "${RUNNER_TEMP}/gameboxly-release.jks"
+      - name: Upload publishable release APK when signed
+        if: ${{ hashFiles('android/app/build/outputs/apk/release/Gameboxly-release.apk') != '' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: Gameboxly-release-for-APKPure
+          path: android/app/build/outputs/apk/release/Gameboxly-release.apk
           if-no-files-found: error
