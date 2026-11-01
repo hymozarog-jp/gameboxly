@@ -53,6 +53,7 @@ const HELP = [
   "⚠️ تسليم الأكواد الفوري للباقات الرقمية فقط. روبلوكس حاليًا تنفيذ يدوي.",
   "📋 /orders — حالات طلبات الشراء اليدوية، بدون الأكواد الرقمية.",
   "📨 /sms لرسائل ليبيانا، مع أزرار قبول/رفض للتحويلات المطابقة. /smsok رقم و /smsno رقم بدائل يدوية.",
+  "🧾 /topups — الطلبات المعلّقة، مع تفاصيل كل طلب وزرّي قبول أو رفض بعد التحقق من التحويل.",
   "🤖 /smsauto status لمعرفة حالة الشحن الآلي، /smsauto off للإيقاف، /smsauto on للتفعيل.",
 ].join("\n");
 
@@ -311,7 +312,54 @@ Deno.serve(async (request: Request) => {
   try {
     let reply = "";
     let deleteSensitiveMessage = false;
-    if (command === "orders") {
+    if (command === "topups") {
+      // Private admin-only recovery for requests created before notifications
+      // were enabled, or when the customer's browser never returned.
+      const {data:pending,error:readError}=await db.from("topup_requests")
+        .select("id,user_id,amount,method,phone,created_at,status")
+        .eq("status","pending").order("created_at",{ascending:false}).limit(8);
+      if(readError)reportError(readError);
+      if(!pending?.length){
+        reply="✅ ما فيش طلبات شحن معلّقة حاليًا.";
+      }else{
+        let sent=0;
+        for(const requestRow of pending){
+          const {data:sms}=await db.from("sms_topup_receipts")
+            .select("review_number,status")
+            .eq("request_id",requestRow.id)
+            .order("received_at",{ascending:false}).limit(1).maybeSingle();
+          const verifiedSms=sms?.status==="matched"
+            ?"📨 وصلت رسالة تحويل مطابقة #"+sms.review_number
+            :"⚠️ لا توجد رسالة تحويل مطابقة مسجّلة";
+          const when=new Date(requestRow.created_at).toLocaleString("ar-LY",{
+            timeZone:"Africa/Tripoli",year:"numeric",month:"2-digit",day:"2-digit",
+            hour:"2-digit",minute:"2-digit",hour12:true
+          });
+          const text="🧾 طلب شحن معلّق — مراجعة الإدارة\n"
+            +"💰 المبلغ: "+Number(requestRow.amount).toFixed(3)+" د.ل\n"
+            +"📱 المشغّل: "+(requestRow.method==="libyana"?"ليبيانا":"المدار")+"\n"
+            +"☎️ رقم التحويل: "+String(requestRow.phone||"—").slice(0,30)+"\n"
+            +"🕒 وقت الطلب: "+when+"\n"
+            +"🆔 رقم الطلب: "+requestRow.id+"\n"
+            +verifiedSms+"\n"
+            +"⚠️ لا تقبل إلا بعد التحقق من وصول المبلغ الحقيقي. القبول يضيف الرصيد إلى حساب الزبون.";
+          const response=await fetch("https://api.telegram.org/bot"+token+"/sendMessage",{
+            method:"POST",headers:{"content-type":"application/json"},
+            body:JSON.stringify({
+              chat_id:Number(adminId),text,
+              reply_markup:{inline_keyboard:[[
+                {text:"✅ قبول بعد التحقق",callback_data:"wt:a:"+requestRow.id},
+                {text:"❌ رفض",callback_data:"wt:r:"+requestRow.id}
+              ]]}
+            })
+          });
+          if(!response.ok){console.error("topups_command_send_failed",response.status);break;}
+          sent++;
+        }
+        reply=sent?"📨 أرسلت "+sent+" طلبات شحن معلّقة مع أزرار المراجعة."
+          :"تعذّر إرسال الطلبات. حاول مرة ثانية.";
+      }
+    } else if (command === "orders") {
       const {data:orders,error:listError}=await db.from("purchase_orders")
         .select("id,product_name,total_amount,roblox_username,status")
         .neq("roblox_username","DIGITAL_CODE")
@@ -330,18 +378,36 @@ Deno.serve(async (request: Request) => {
       const action = payload.toLowerCase();
       if (!action || action === "status") {
         const { data: cfg, error: cfgError } = await db.from("sms_auto_credit_settings")
-          .select("enabled").eq("id",1).single();
+          .select("enabled,approval_mode").eq("id",1).single();
         if (cfgError) reportError(cfgError);
-        reply = "🤖 الشحن الآلي: " + (cfg?.enabled ? "✅ مفعّل" : "⏸️ متوقف") +
-          "\nيعتمد تحويلات ليبيانا الحديثة للحسابات المربوطة فقط (حتى 10 د.ل للتحويل)." +
+        const {data:lastSms,error:lastSmsError}=await db.from("sms_topup_receipts")
+          .select("received_at").order("received_at",{ascending:false}).limit(1).maybeSingle();
+        if(lastSmsError)reportError(lastSmsError);
+        const {count:pendingCount,error:pendingError}=await db.from("topup_requests")
+          .select("id",{head:true,count:"exact"}).eq("status","pending").eq("method","libyana")
+          .gte("created_at",new Date(Date.now()-24*60*60*1000).toISOString());
+        if(pendingError)reportError(pendingError);
+        const lastReceived=lastSms?.received_at?Date.parse(lastSms.received_at):0;
+        const ageMinutes=lastReceived?Math.max(0,Math.floor((Date.now()-lastReceived)/60000)):null;
+        const flowState=ageMinutes===null
+          ?"⚠️ لا يوجد سجل SMS مستلَم؛ راجع إعدادات تطبيق تحويل الرسائل."
+          :ageMinutes>30
+            ?"⚠️ آخر رسالة SMS مسجلة منذ "+(ageMinutes<60?ageMinutes+" دقيقة":Math.floor(ageMinutes/60)+" ساعة")+" تقريبًا. إذا حدث تحويل أحدث، تحقق من تشغيل تطبيق تحويل الرسائل وصلاحياته والويبهوك."
+            :"📨 آخر إشعار SMS مسجل منذ "+ageMinutes+" دقيقة.";
+        reply = "📨 استقبال طلبات شحن ليبيانا: " + (cfg?.enabled ? "✅ مفعّل" : "⏸️ متوقف") +
+          "\n🧾 اعتماد الرصيد: " + (cfg?.approval_mode==="manual" ? "يدوي — أنت تضغط قبول أو رفض من تيليجرام لكل مبلغ" : "آلي للتحويلات المؤهلة حتى 10 د.ل") +
+          "\n🛡️ القفل المالي: الشحن التلقائي يتطلب تأكيد تحصيل رسميًا مستقلاً من ليبيانا، ولم يتم ربط هذه الخدمة بعد. SMS وحدها لا تضيف رصيدًا." +
+          "\n⚠️ لقبول الطلب يدويًا تأكد بنفسك من وصول المبلغ؛ إنشاء الطلب أو وصول SMS ليس إثباتًا كافيًا." +
+          "\n"+flowState+
+          "\n⏳ طلبات ليبيانا المعلقة في آخر 24 ساعة: "+String(pendingCount||0)+
           "\nللإيقاف: /smsauto off  |  للتشغيل: /smsauto on";
       } else if (action === "on" || action === "off") {
         const { error: setError } = await db.from("sms_auto_credit_settings")
           .update({enabled:action==="on",activated_at:new Date().toISOString()}).eq("id",1);
         if (setError) reportError(setError);
         reply = action === "on"
-          ? "✅ فعلت الشحن الآلي للرسائل الجديدة فقط، للأرقام المرتبطة بالحسابات، مع حد 10 د.ل للتحويل."
-          : "⏸️ أوقفت الشحن الآلي. تظل الرسائل تصل للمراجعة يدويًا.";
+          ? "✅ فعلت استقبال طلبات الشحن، وليس القبول المالي التلقائي. القبول يدوي حتى يتوفر تأكيد رسمي مستقل من المشغل."
+          : "⏸️ أوقفت استقبال طلبات الشحن الجديدة. الطلبات المعلقة تبقى متاحة للمراجعة.";
       } else reply = "الصيغة: /smsauto status أو /smsauto on أو /smsauto off";
     } else if (command === "sms") {
       const { error: matchError } = await db.rpc("sms_match_pending_receipts");
