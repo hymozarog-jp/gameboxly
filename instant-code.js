@@ -52,14 +52,76 @@
     document.body.append(overlay);
     close.focus();
   }
+  // Same full-screen detail menu as the other GAMEBOXLY packages.
+  // Buying remains a separate, explicit action; opening a card never spends wallet credit.
+  function confirmCodePurchase(name,amount){
+    return new Promise(resolve=>{
+      const prior=document.getElementById('gbCodePurchaseConfirm');
+      if(prior)prior.remove();
+      const overlay=document.createElement('section');
+      overlay.id='gbCodePurchaseConfirm';
+      overlay.setAttribute('role','dialog');
+      overlay.setAttribute('aria-modal','true');
+      overlay.setAttribute('aria-label','قائمة طلب الكود الرقمي');
+      const shell=document.createElement('div');
+      shell.className='gb-code-shell';
+      const top=document.createElement('div');
+      top.className='gb-package-top';
+      const back=document.createElement('button');
+      back.type='button';back.className='gb-package-back';back.textContent='رجوع للباقات ←';
+      const brand=document.createElement('span');
+      brand.className='gb-package-brand';brand.textContent='GAMEBOXLY • DIGITAL CODE';
+      top.append(back,brand);
+      const header=document.createElement('div');
+      header.className='gb-code-heading';
+      const art=document.createElement('div');art.className='gb-code-art';art.textContent='◈';art.setAttribute('aria-hidden','true');
+      const title=document.createElement('div');
+      const h=document.createElement('h2');h.textContent='قائمة طلب المنتج';
+      const desc=document.createElement('p');desc.className='gb-code-description';desc.textContent='راجع الباقة قبل تأكيد الدفع من محفظتك.';
+      title.append(h,desc);header.append(art,title);
+      const summary=document.createElement('div');summary.className='gb-code-summary';
+      const item=document.createElement('strong');item.textContent=String(name||'كود رقمي');
+      const price=document.createElement('span');price.textContent=Number(amount).toFixed(2)+' د.ل';
+      summary.append(item,price);
+      const info=document.createElement('p');info.className='gb-code-note';
+      info.textContent='سيتم خصم قيمة المنتج من محفظتك فقط بعد الضغط على «تأكيد الشراء». لا تضغط إذا لم تكن تريد شراء الكود.';
+      const actions=document.createElement('div');actions.className='gb-code-actions';
+      const cancel=document.createElement('button');cancel.type='button';cancel.textContent='إلغاء';
+      const approve=document.createElement('button');approve.type='button';approve.className='gb-code-approve';approve.textContent='تأكيد الشراء';
+      actions.append(cancel,approve);shell.append(top,header,summary,info,actions);overlay.append(shell);
+      let settled=false;
+      function finish(confirmed){
+        if(settled)return;
+        settled=true;
+        overlay.removeEventListener('keydown',keyHandler);
+        overlay.remove();resolve(confirmed);
+      }
+      function keyHandler(event){
+        if(event.key==='Escape'){event.preventDefault();finish(false);}
+        // Keep keyboard focus inside the checkout modal.
+        if(event.key==='Tab'){
+          const controls=[back,cancel,approve];
+          const first=controls[0],last=controls[controls.length-1];
+          if(event.shiftKey&&document.activeElement===first){event.preventDefault();last.focus();}
+          else if(!event.shiftKey&&document.activeElement===last){event.preventDefault();first.focus();}
+        }
+      }
+      overlay.addEventListener('keydown',keyHandler);
+      back.addEventListener('click',()=>finish(false));
+      cancel.addEventListener('click',()=>finish(false));
+      approve.addEventListener('click',()=>finish(true));
+      document.body.append(overlay);
+      back.focus({preventScroll:true});
+    });
+  }
   window.showInstantCode=showDeliveredCode;
   window.openInstantCodeCheckout=async function(productId, productName, amount){
     if(busy) return;
     const db=client();
     if(!db){alert('تعذر تحميل المتجر. أعد تحميل الصفحة.');return;}
-    if(!confirm('شراء '+productName+' بمبلغ '+Number(amount).toFixed(2)+' د.ل واستلام الكود فورًا من محفظتك؟'))return;
     busy=true;
     try {
+      if(!await confirmCodePurchase(productName,amount))return;
       const {data:{user},error:authError}=await db.auth.getUser();
       if(authError||!user){alert('سجّل دخولك أولاً للشراء.');return;}
       if(typeof window.ensurePurchasePhone!=='function'){alert('تعذر تحميل التحقق من رقم الهاتف. حدّث الصفحة وحاول مرة ثانية.');return;}
