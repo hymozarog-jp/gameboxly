@@ -143,12 +143,22 @@
     }
     root.dataset.state='pending';
     title.textContent='جاري التحقق من التحويل';
+    const ageMs=data?.created_at?Date.now()-Date.parse(data.created_at):0;
+    const smsDelayed=Number.isFinite(ageMs)&&ageMs>=5*60*1000;
+    const followOrders=root.querySelector('.tpv-dismiss');
     if(data?.sms_status==='matched'){
       desc.textContent='وصل إشعار تحويل مطابق لطلبك. العملية الآن قيد المراجعة؛ لا تكرر التحويل.';
+    }else if(smsDelayed){
+      root.dataset.state='delayed';
+      title.textContent='لم تصل رسالة التحويل بعد';
+      desc.textContent='مرّت أكثر من 5 دقائق ولم يسجّل النظام رسالة ليبيانا مطابقة. إذا خُصم الرصيد فعلًا، راجع طلبك وتواصل مع المتجر برقم الطلب؛ لا تعِد التحويل.';
+      if(followOrders)followOrders.textContent='عرض طلباتي';
     }else{
       desc.textContent='ننتظر رسالة تحويل ليبيانا ومطابقتها مع طلبك. سيُضاف الرصيد تلقائيًا فور اعتماد الطلب المؤهل، أو يُحال للمراجعة.';
     }
-    foot.textContent='الرجوع من الاتصال لا يؤكد نجاح الدفع. لا تكرر التحويل.';
+    foot.textContent=smsDelayed&&data?.sms_status!=='matched'
+      ?'القبول التلقائي يتطلب وصول إشعار SMS حقيقي إلى النظام؛ الرجوع من الاتصال ليس إثباتًا للدفع.'
+      :'الرجوع من الاتصال لا يؤكد نجاح الدفع. لا تكرر التحويل.';
   }
   function showVerifier(id,amount){
     if(!id)return;
@@ -242,14 +252,14 @@
       // The older SMS detail RPC is optional; its failure must not hide an
       // already-approved wallet credit.
       const {data:row,error}=await db.from('topup_requests')
-        .select('id,status,amount')
+        .select('id,status,amount,created_at')
         .eq('id',String(id)).maybeSingle();
       if(error)throw error;
       if(!row){
         if(root)updateVerifier(id,null,true);
         return;
       }
-      const data={status:row.status,amount:row.amount,sms_status:'not_received'};
+      const data={status:row.status,amount:row.amount,created_at:row.created_at,sms_status:'not_received'};
       if(row.status==='pending'){
         try{
           const detail=await db.rpc('get_my_ussd_topup_status',{p_request_id:id});
@@ -276,7 +286,10 @@
       if(data.sms_status==='matched'){
         if(status)status.textContent='📩 وصل إشعار تحويل مطابق. الطلب الآن قيد المراجعة، لا تكرر التحويل.';
       }else if(status){
-        status.textContent='⏳ بانتظار رسالة ليبيانا ومطابقة التحويل. لا تكرر التحويل.';
+        const ageMs=Date.now()-Date.parse(row.created_at||'');
+        status.textContent=Number.isFinite(ageMs)&&ageMs>=5*60*1000
+          ?'⚠️ لم تصل رسالة تحويل مطابقة بعد 5 دقائق. إذا خُصم الرصيد، تواصل مع المتجر برقم الطلب ولا تكرر التحويل.'
+          :'⏳ بانتظار رسالة ليبيانا ومطابقة التحويل. لا تكرر التحويل.';
       }
     }catch(e){
       updateVerifier(id,null,true);
