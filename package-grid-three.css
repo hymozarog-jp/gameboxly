@@ -1,59 +1,16 @@
-/* Consistent three-column product lists, including narrow phone screens. */
-html #robuxModal .package-grid,
-html #robuxModal.robux-single-offer .package-grid,
-html #robloxGamePage .rgp-mm2-subcategory .rgp-packages,
-html #robloxGamePage .rgp-packages,
-html #robloxGamePage .sab-products-grid,
-html #pubgCategoryPage.pubg-premium.pubg-inner-page .pubg-packages{
- display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:10px!important;align-items:stretch!important;
-}
-html #robuxModal .package-grid>.robux-package,
-html #robuxModal.robux-single-offer .package-grid>.robux-package{
- width:100%!important;max-width:none!important;min-width:0!important;min-height:0!important;aspect-ratio:auto!important;border-radius:15px!important;padding:0!important;display:flex!important;flex-direction:column!important;justify-content:flex-start!important;
-}
-html #robuxModal .package-grid>.robux-package>.robux-art{
- position:relative!important;inset:auto!important;transform:none!important;display:block!important;width:70%!important;height:auto!important;aspect-ratio:1!important;margin:12px auto 6px!important;max-width:120px!important;
-}
-html #robuxModal .package-grid>.robux-package>.robux-art img{width:100%!important;height:100%!important;object-fit:contain!important;object-position:center!important}
-html #robuxModal.robux-single-offer .package-grid>.robux-package>.robux-display-art{
- position:relative!important;inset:auto!important;width:100%!important;height:auto!important;aspect-ratio:1!important;object-fit:contain!important;max-width:160px!important;max-height:none!important;padding:10px!important;box-sizing:border-box!important;margin:0 auto!important;animation:none!important;
-}
-html #robuxModal.robux-single-offer .package-grid>.robux-package:has(.robux-display-art)>.robux-art{display:none!important}
-html #robuxModal .package-grid>.robux-package>.robux-plus{width:24px!important;height:24px!important;top:6px!important;left:6px!important;font-size:20px!important}
-html #robuxModal .package-grid>.robux-package>span:not(.robux-art):not(.robux-plus),
-html #robuxModal.robux-single-offer .package-grid>.robux-package>span:not(.robux-art):not(.robux-plus){padding:9px 7px!important;min-height:0!important;align-items:center!important;margin-top:auto!important;overflow-wrap:anywhere}
-html #robuxModal .package-grid>.robux-package strong{font-size:14px!important;line-height:1.5!important;text-align:center!important}
-html #robuxModal .package-grid>.robux-package small:not(.stock-label){font-size:13px!important;padding:5px 7px!important;margin-top:5px!important;align-self:center!important}
-html #robuxModal .package-grid>.robux-package .stock-label{font-size:10px!important;align-self:center!important;text-align:center!important}
-html #robloxGamePage .rgp-mm2-subcategory .rgp-package,
-html #robloxGamePage .sab-item-card,
-html #pubgCategoryPage.pubg-premium .pubg-pack{min-width:0!important;min-height:0!important;padding:9px!important;border-radius:15px!important;overflow:hidden!important;overflow-wrap:anywhere;display:flex!important;flex-direction:column!important}
-html #robloxGamePage .rgp-package .mm2-item-art,
-html #robloxGamePage .sab-card-art,
-html #pubgCategoryPage.pubg-premium .pubg-coin-wrap{width:100%!important;height:auto!important;aspect-ratio:1!important;min-height:0!important;flex:0 0 auto!important;margin:0 0 9px!important;display:grid!important;place-items:center!important;border-radius:11px!important;overflow:hidden!important}
-html #robloxGamePage .rgp-package .mm2-item-art img,
-html #robloxGamePage .sab-card-art .sab-character-image,
-html #pubgCategoryPage.pubg-premium .pubg-uc-art{width:100%!important;height:100%!important;min-height:0!important;max-width:100%!important;max-height:100%!important;object-fit:contain!important;object-position:center!important;padding:5px!important;box-sizing:border-box!important}
-html #robloxGamePage .rgp-mm2-subcategory .rgp-package strong,
-html #robloxGamePage .sab-item-card h3{font-size:14px!important;line-height:1.5!important;margin:4px 0 7px!important}
-html #robloxGamePage .rgp-package .mm2-price,
-html #robloxGamePage .sab-card-footer strong{font-size:14px!important;line-height:1.5!important}
-html #robloxGamePage .rgp-package .mm2-delivery{font-size:10px!important;line-height:1.6!important}
-html #robloxGamePage .sab-card-footer{flex-direction:column!important;align-items:stretch!important;gap:7px!important;padding-top:8px!important}
-html #robloxGamePage .sab-card-top{flex-wrap:wrap;gap:3px;margin-bottom:6px}
-html #robloxGamePage .sab-card-top small,html #robloxGamePage .sab-card-label{font-size:8px!important;letter-spacing:0!important}
-html #robloxGamePage .sab-buy{min-height:38px;padding:7px 3px!important;font-size:10px!important;white-space:normal}
-html #robloxGamePage .sab-unavailable{font-size:10px!important;padding:6px 3px!important;text-align:center}
-html #robloxGamePage .gb-card-open{font-size:10px!important;line-height:1.5!important;margin-top:auto!important;padding-top:8px!important}
-html #robloxGamePage .rgp-empty,html #robloxGamePage .sab-fetch-error{grid-column:1/-1}
-html #pubgCategoryPage.pubg-premium .pubg-pack-quantity{font-size:22px!important}
-html #pubgCategoryPage.pubg-premium .pubg-pack-name{font-size:11px!important}
-html #pubgCategoryPage.pubg-premium .pubg-pack-bottom{flex-direction:column!important;align-items:stretch!important;gap:7px!important}
-@media(max-width:420px){
- html #robuxModal .package-grid,html #robuxModal.robux-single-offer .package-grid,html #robloxGamePage .rgp-packages,html #robloxGamePage .rgp-mm2-subcategory .rgp-packages,html #robloxGamePage .sab-products-grid{gap:7px!important}
- html #robloxGamePage .rgp-mm2-subcategory .rgp-package,html #robloxGamePage .sab-item-card{padding:7px!important}
- html #robuxModal .package-grid>.robux-package strong,html #robloxGamePage .rgp-mm2-subcategory .rgp-package strong,html #robloxGamePage .sab-item-card h3{font-size:12px!important}
- html #robuxModal .package-grid>.robux-package small:not(.stock-label){font-size:12px!important;padding:4px!important}
-}
-html #robloxGamePage .rgp-mm2-subcategory .rgp-package>strong,
-html #robloxGamePage .sab-item-card h3{min-height:3em!important}
+/* Only Roblox category tiles; product package layouts keep their original styles. */
+html #llLanding .ll-catalog:has(.ll-game-section),
+html #robloxGamePage .rgp-grid{display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:10px!important;align-items:stretch!important}
+html #llLanding .ll-game-section{min-width:0!important}
+html #llLanding .ll-game-section-art{width:100%!important;aspect-ratio:1!important;height:auto!important;border-radius:16px!important;overflow:hidden!important}
+html #llLanding .ll-game-section-art img{display:block!important;width:100%!important;height:100%!important;object-fit:contain!important;object-position:center!important;padding:7px!important;box-sizing:border-box!important}
+html #llLanding .ll-game-section-details strong{font-size:clamp(12px,3vw,18px)!important;line-height:1.5!important}
+html #llLanding .ll-game-section-details small{font-size:10px!important;line-height:1.6!important;overflow-wrap:anywhere}
+html #llLanding .ll-game-section-tag{font-size:7px!important;letter-spacing:0!important;top:5px!important;right:5px!important;left:5px!important}
+html #robloxGamePage .rgp-grid .rgp-card{min-width:0!important;min-height:0!important;border-radius:16px!important}
+html #robloxGamePage .rgp-grid .rgp-card img{display:block!important;width:100%!important;height:auto!important;aspect-ratio:1!important;object-fit:contain!important;object-position:center!important;padding:7px!important;box-sizing:border-box!important}
+html #robloxGamePage .rgp-grid .rgp-card-body{padding:10px 7px!important}
+html #robloxGamePage .rgp-grid .rgp-card h3{font-size:14px!important;line-height:1.5!important;overflow-wrap:anywhere}
+html #robloxGamePage .rgp-grid .rgp-card p{font-size:10px!important;line-height:1.6!important}
+html #robloxGamePage .rgp-grid .rgp-action{font-size:10px!important;padding:7px 4px!important;white-space:normal!important}
+@media(max-width:420px){html #llLanding .ll-catalog:has(.ll-game-section),html #robloxGamePage .rgp-grid{gap:8px!important}}
