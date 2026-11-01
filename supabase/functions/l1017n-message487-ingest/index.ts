@@ -58,25 +58,63 @@ function isUUID(s:string):boolean{
 function ack(eventId:string,details:Record<string,unknown>={}){
   return respond({status:"accepted",event_id:eventId,...details});
 }
-async function notifyAdmin(reviewNumber:number, amount:number, phone:string,matched:boolean,autoCredited:boolean,reason:string){
+async function customerLabel(db:any,requestId:string|null,provider:string,phone:string){
+  let userId:string|null=null;
+  if(requestId){
+    const {data:requestRow}=await db.from("topup_requests")
+      .select("user_id").eq("id",requestId).maybeSingle();
+    userId=requestRow?.user_id??null;
+  }
+  if(!userId){
+    const {data:link}=await db.from("sms_sender_wallet_links")
+      .select("user_id").eq("provider",provider).eq("transfer_phone",phone).maybeSingle();
+    userId=link?.user_id??null;
+  }
+  if(!userId)return "غير محدد";
+  try{
+    const {data,error}=await db.auth.admin.getUserById(userId);
+    if(error||!data?.user)return "حساب مسجّل";
+    const u=data.user;
+    return String(u.user_metadata?.full_name||u.user_metadata?.name||u.email?.split("@")[0]||"زبون")
+      .replace(/[\\r\\n\\t]+/g," ").trim().slice(0,65)||"زبون";
+  }catch{return "حساب مسجّل"}
+}
+async function notifyAdmin(db:any,reviewNumber:number,amount:number,phone:string,matched:boolean,autoCredited:boolean,reason:string,stamp:number,requestId:string|null){
   const token=Deno.env.get("TG_BOT_TOKEN")||"";
   const owner=Deno.env.get("TG_ADMIN_ID")||"";
-  if(!token||!/^\d{5,15}$/.test(owner))return;
-  const message="📩 رسالة تحويل من Message487\n"+
-    "💰 "+amount.toFixed(3)+" د.ل\n📱 رقم المحوّل: ***"+phone.slice(-4)+"\n"+
-    "🔎 المرجع: "+reviewNumber+"\n"+
-    (autoCredited?"✅ أضيف الرصيد آليًا بعد فحوصات الطلب والتوثيق ومنع التكرار.":matched
-      ?"⏳ تم مطابقة الطلب لكنه يحتاج مراجعة قبل إضافة الرصيد.":"⚠️ لم تتم مطابقة الطلب مع حساب موثّق.")+
-    (autoCredited?"\n🔒 اعتمد النظام هذا التحويل مرة واحدة.":
-      "\n🔎 سبب المراجعة: "+reason+"\nتأكد من وصول الرصيد فعليًا قبل الاعتماد."+
-      "\nللمراجعة: /sms\nبعد التأكد فقط: /smsok "+reviewNumber+
-      "\nللرفض: /smsno "+reviewNumber);
+  if(!token||!/^\\d{5,15}$/.test(owner))return;
+  const customer=await customerLabel(db,requestId,"libyana",phone);
+  const when=new Date(stamp).toLocaleString("ar-LY",{
+    timeZone:"Africa/Tripoli",year:"numeric",month:"2-digit",day:"2-digit",
+    hour:"2-digit",minute:"2-digit",hour12:true
+  });
+  const state=autoCredited?"✅ تم الشحن تلقائيًا"
+    :matched?(amount>10?"⏳ بانتظار موافقتك — أكثر من 10 د.ل":"⏳ طلب مطابق، يحتاج مراجعتك")
+    :"⚠️ لا يوجد طلب شحن مطابق — لم يُضاف رصيد";
+  const message="🟣 GAMEBOXLY | تحويل ليبيانا\\n"
+    +"━━━━━━━━━━━━━━━━\\n"
+    +"👤 الزبون: "+customer+"\\n"
+    +"📱 رقم المحوّل: ***"+phone.slice(-4)+"\\n"
+    +"💰 المبلغ: "+amount.toFixed(3)+" د.ل\\n"
+    +"🕒 وقت الرسالة: "+when+"\\n"
+    +"🧾 رقم التحويل: #"+reviewNumber+"\\n"
+    +"📋 الحالة: "+state+"\\n\\n"
+    +(autoCredited?"🔒 أُضيف الرصيد مرة واحدة فقط."
+      :matched?"تحقّق من وصول التحويل فعليًا قبل الضغط على قبول."
+      :"لا يمكن قبول رسالة غير مطابقة. راجع الحساب والطلب أولًا.")
+    +(autoCredited?"":"\\nللمراجعة: /sms");
+  const payload:any={chat_id:Number(owner),text:message};
+  if(!autoCredited){
+    const buttons=matched
+      ?[{text:"✅ قبول التحويل",callback_data:"sr:a:"+reviewNumber},
+         {text:"❌ رفض التحويل",callback_data:"sr:r:"+reviewNumber}]
+      :[{text:"❌ رفض الرسالة",callback_data:"sr:r:"+reviewNumber}];
+    payload.reply_markup={inline_keyboard:[buttons]};
+  }
   try{
     const r=await fetch("https://api.telegram.org/bot"+token+"/sendMessage",{
-      method:"POST",
-      headers:{"content-type":"application/json"},
-      body:JSON.stringify({chat_id:Number(owner),text:message}),
-      signal:AbortSignal.timeout(7000)
+      method:"POST",headers:{"content-type":"application/json"},
+      body:JSON.stringify(payload),signal:AbortSignal.timeout(7000)
     });
     if(!r.ok)console.error("message487_admin_notification_error",r.status);
   }catch{console.error("message487_admin_notification_unavailable")}
@@ -154,7 +192,7 @@ Deno.serve(async(req:Request)=>{
   const {error:matchError}=await db.rpc("sms_match_pending_receipts");
   if(matchError)console.error("message487_match_error",matchError.code);
   const {data:latest}=await db.from("sms_topup_receipts")
-    .select("status").eq("review_number",data.review_number).maybeSingle();
+    .select("status,request_id").eq("review_number",data.review_number).maybeSingle();
   const matched=latest?.status==="matched";
   // Only the database decides whether this verified, matched transfer may be
   // credited without manual action. Anything questionable remains pending.
@@ -172,7 +210,7 @@ Deno.serve(async(req:Request)=>{
       approvalReason=String(decision?.reason||"review_required");
     }
   }else if(matchError){approvalReason="matching_failed";}
-  await notifyAdmin(data.review_number,receipt.amount,receipt.transfer_phone,matched,autoCredited,approvalReason);
+  await notifyAdmin(db,data.review_number,receipt.amount,receipt.transfer_phone,matched,autoCredited,approvalReason,stamp,latest?.request_id??null);
   return ack(eventId,{stored:true,matched,auto_credited:autoCredited,review_number:data.review_number,
     next:autoCredited?"credited":matched?"review_required":"awaiting_matching_request"});
 });
