@@ -154,10 +154,10 @@
       desc.textContent='مرّت أكثر من 5 دقائق ولم يسجّل النظام رسالة ليبيانا مطابقة. إذا خُصم الرصيد فعلًا، راجع طلبك وتواصل مع المتجر برقم الطلب؛ لا تعِد التحويل.';
       if(followOrders)followOrders.textContent='عرض طلباتي';
     }else{
-      desc.textContent='ننتظر رسالة تحويل ليبيانا ومطابقتها مع طلبك. سيُضاف الرصيد تلقائيًا فور اعتماد الطلب المؤهل، أو يُحال للمراجعة.';
+      desc.textContent='طلبك أُرسل لمراجعة إدارة المتجر، ويُضاف الرصيد فقط بعد قبولها والتأكد من وصول التحويل.';
     }
     foot.textContent=smsDelayed&&data?.sms_status!=='matched'
-      ?'القبول التلقائي يتطلب وصول إشعار SMS حقيقي إلى النظام؛ الرجوع من الاتصال ليس إثباتًا للدفع.'
+      ?'قبول الشحن يحتاج موافقة الإدارة بعد التحقق من وصول التحويل؛ الرجوع من الاتصال ليس إثبات دفع.'
       :'الرجوع من الاتصال لا يؤكد نجاح الدفع. لا تكرر التحويل.';
   }
   const adminNotified=new Set();
@@ -388,7 +388,7 @@
       }
       if(readiness.error)throw readiness.error;
       if(readiness.data!==true){
-        show('warning','الشحن الآلي غير متاح حاليًا','لا تحوّل أي رصيد قبل ما يرجع النظام يشتغل. التأكد من التوثيق أو إعدادات الإدارة مطلوب.');
+        show('warning','خدمة استقبال طلبات الشحن غير متاحة حاليًا','لا تحوّل أي رصيد قبل ما يرجع النظام يشتغل. التأكد من التوثيق أو إعدادات الإدارة مطلوب.');
         return;
       }
       const {data:intent,error:intentError}=await db.rpc('create_ussd_topup_intent',{p_amount:amount});
@@ -399,7 +399,7 @@
       // A USSD intent is not payment evidence. Notify Telegram when the customer
       // opens the verification view after attempting the carrier transfer.
       if(intent.state==='matched'){
-        show('ok','وصل إشعار التحويل','وصل إشعار بنفس الرقم والمبلغ. يفحص النظام الطلب تلقائيًا؛ ما تحولش المبلغ مرة ثانية.');
+        show('ok','وصل إشعار التحويل','وصل إشعار بنفس الرقم والمبلغ، وطلبك بانتظار قرار الإدارة. لا تحوّل المبلغ مرة ثانية.');
         const current=host();
         const status=el('div','auto-topup-status','⏳ بانتظار تأكيد رصيد المحفظة.');
         status.id='ussdTransferStatus';
@@ -408,7 +408,7 @@
         return;
       }
       const area=show('ok','تم تجهيز طلب شحن '+amount+' د.ل',
-        'بعد تأكيد التحويل من ليبيانا، يطابق النظام المبلغ والرقم الموثّق بإشعار التحويل. بعض العمليات، خصوصًا المبالغ الكبيرة، تحتاج مراجعة الإدارة قبل إضافة الرصيد.');
+        'بعد تأكيد التحويل من ليبيانا، نرسل تفاصيل الطلب للمسؤول على تيليجرام للمراجعة. لا يُضاف الرصيد إلا بعد موافقته.');
       if(!area)return;
       const panel=el('div','auto-topup-transfer');
       panel.append(el('div','','المبلغ: '+amount.toFixed(2)+' د.ل'));
@@ -444,7 +444,7 @@
         showVerifier(intent.request_id,amount);
       });
       panel.append(status,refresh);
-      panel.append(el('p','auto-topup-note','مهم: الاتصال يفتح خدمة تحويل ليبيانا، وتحتاج تأكيد التحويل بنفسك. شحن المحفظة قد يتم آليًا بعد وصول إشعار SMS مطابق من هاتف المتجر. إشعارات SMS ليست تأكيدًا رسميًا من مشغّل الشبكة؛ التحويلات غير المطابقة تحتاج مراجعة.'));
+      panel.append(el('p','auto-topup-note','مهم: فتح الاتصال وحده لا يعني وصول المبلغ. بعد التحويل اضغط «حوّلت الرصيد — متابعة التحقق»؛ سيصلك قرار الإدارة في حالة الطلب. لا تكرر التحويل.'));
       area.append(panel);
       refreshRequest(intent.request_id);
     }catch(err){
