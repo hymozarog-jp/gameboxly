@@ -4,7 +4,7 @@
   s.onerror=function(){console.error('تعذر تحميل وظائف المتجر')};
   s.onload=function(){
     var auto=document.createElement('script');
-    auto.src='auto-topup.js?v=telegram-manual-review3&credit-drop=2';
+    auto.src='auto-topup.js?v=notify-every-order4&credit-drop=2';
     auto.onerror=function(){console.error('تعذر تحميل الشحن الآلي');var b=document.getElementById('transferInstructions');if(b)b.textContent='تعذر تحميل خدمة الشحن الآلي؛ لا تحوّل حتى يتم إصلاحها.'};
     document.body.appendChild(auto);
     var ranking=document.createElement('script');
