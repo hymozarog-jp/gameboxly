@@ -48,6 +48,15 @@ jobs:
           assert(legacy.includes('.select(\'balance,madar_balance\')'),'Header balance must follow carrier');
           assert(topup.includes('get_my_ussd_topup_status'),'Wallet top-ups require backend verification');
           assert(!topup.includes("rpc('sms_auto_credit_receipt'"),'Client cannot credit itself');
+          assert(topup.includes('notifyAdminForReview(intent.request_id)'),
+            'Every Libyana topup request must notify the store owner');
+          assert(topup.includes("db.functions.invoke('l1017n-topup-notify'"),
+            'Topup notifications must use authenticated server function');
+          for(const file of ['legacy-app.js','instant-code.js','pubg-premium.js',
+            'brainrot-store.js','store-menu.js']){
+            assert(read(file).includes('l1017n-purchase-notify'),
+              'Missing purchase owner notification in '+file);
+          }
           assert(read('wallet-luxe.js').includes('supabaseClient.rpc("send_wallet_balance"'));
           assert(read('404.html').includes('href="/L1017n/"'),'Broken links need a safe home destination');
           for(const file of ['app.js','legacy-app.js','index.html','auto-topup.js']){
