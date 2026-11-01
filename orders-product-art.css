@@ -1,0 +1,37 @@
+/* Product artwork in Orders: visual only, never alters order data or payments. */
+#ordersView .orders-game-icon.orders-icon-robux,
+#ordersView .orders-game-icon.orders-icon-libyana{
+ position:relative;display:grid!important;place-items:center!important;
+ overflow:hidden!important;padding:0!important;
+ background:#1a1333!important;
+ border:1px solid #8053d5!important;
+ border-radius:14px!important;
+ box-shadow:0 0 0 2px #5f42b31e,0 3px 12px #150b352e!important;
+}
+#ordersView .orders-game-icon.orders-icon-libyana{
+ background:#260e30!important;
+ border-color:#b34bc3!important;
+ box-shadow:0 0 0 2px #ab318524,0 3px 12px #360b322c!important;
+}
+#ordersView .orders-game-icon .orders-product-art{
+ display:block!important;
+ width:100%!important;height:100%!important;
+ max-width:100%!important;max-height:100%!important;
+ object-fit:cover!important;object-position:center!important;
+ border-radius:inherit!important;
+ margin:0!important;
+ flex:0 0 auto;
+ font-size:0;
+}
+#ordersView .orders-modern-card .orders-game-icon:has(.orders-product-art){
+ align-self:center!important;
+}
+@media(max-width:540px){
+ #ordersView .orders-game-icon.orders-icon-robux,
+ #ordersView .orders-game-icon.orders-icon-libyana{
+ border-radius:12px!important;
+ }
+}
+@media(prefers-reduced-motion:reduce){
+ #ordersView .orders-game-icon .orders-product-art{transition:none!important}
+}
