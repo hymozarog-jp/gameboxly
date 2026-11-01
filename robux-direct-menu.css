@@ -1,0 +1,48 @@
+/* GAMEBOXLY — open a complete order menu directly from the Robux card. */
+#robuxModal .robux-checkout-bar{display:none!important}
+#robuxModal .robux-package:not(:disabled){cursor:pointer}
+#robuxPurchaseScreen.robux-direct-menu{
+  background:radial-gradient(ellipse at 60% 0%,#402a65 0%,#171d37 33%,#0a1020 83%)!important;
+  padding:calc(22px + env(safe-area-inset-top,0px)) 16px calc(42px + env(safe-area-inset-bottom,0px))!important;
+  animation:gbMenuEnter .24s ease both;
+}
+#robuxPurchaseScreen.robux-direct-menu .robux-menu-top{
+  max-width:580px;margin:0 auto 24px;
+  display:flex;justify-content:space-between;align-items:center;gap:12px;
+}
+#robuxPurchaseScreen.robux-direct-menu .robux-purchase-back{
+  margin:0!important;background:#262445!important;color:#f8f5ff!important;
+  border:1px solid #8a78c35f!important;border-radius:14px!important;
+  padding:10px 15px!important;font-size:13px!important;font-weight:700!important;cursor:pointer;
+}
+#robuxPurchaseScreen .robux-menu-kicker{font:700 11px/1.2 system-ui,sans-serif;letter-spacing:.7px;color:#b8a5f4}
+#robuxPurchaseScreen .robux-menu-heading{
+  max-width:580px;margin:0 auto 16px;display:flex;align-items:center;gap:14px;
+}
+#robuxPurchaseScreen .robux-menu-heading img{width:83px;height:83px;object-fit:contain;filter:drop-shadow(0 10px 15px #0008)}
+#robuxPurchaseScreen .robux-menu-heading h2{
+  font-size:clamp(21px,5vw,26px)!important;
+  line-height:1.5!important;margin:0 0 5px!important;color:#fff!important;
+}
+#robuxPurchaseScreen .robux-menu-heading p{margin:0;color:#b5bedc;font-size:13px;line-height:1.7}
+#robuxPurchaseScreen .robux-menu-summary{
+  max-width:580px;margin:0 auto 18px;display:flex;justify-content:space-between;
+  gap:16px;align-items:center;background:#1b2240;
+  border:1px solid #8170b880;border-radius:17px;padding:15px 18px;color:#fff;
+}
+#robuxPurchaseScreen .robux-menu-summary strong{font-size:16px}
+#robuxPurchaseScreen .robux-menu-summary span{font-size:18px;color:#e2d8ff;font-weight:800;white-space:nowrap}
+#robuxPurchaseScreen.robux-direct-menu #purchaseBox{max-width:580px!important}
+#robuxPurchaseScreen.robux-direct-menu #purchaseForm{
+  background:#171d36!important;border:1px solid #65598c!important;
+  border-radius:21px!important;box-shadow:0 14px 40px #0004;
+}
+#robuxPurchaseScreen.robux-direct-menu #purchaseForm input{max-width:100%}
+@keyframes gbMenuEnter{from{opacity:.5;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+@media(max-width:430px){
+ #robuxPurchaseScreen .robux-menu-heading img{width:67px;height:67px}
+ #robuxPurchaseScreen .robux-menu-summary{padding:12px 14px}
+ #robuxPurchaseScreen .robux-menu-summary strong{font-size:14px}
+ #robuxPurchaseScreen .robux-menu-summary span{font-size:16px}
+}
+@media(prefers-reduced-motion:reduce){#robuxPurchaseScreen.robux-direct-menu{animation:none!important}}
