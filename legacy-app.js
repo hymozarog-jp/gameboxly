@@ -138,6 +138,14 @@ async function renderOrders(){
  const group=x=>['rejected','refunded'].includes(x.status)?'refunded':x.status==='completed'||x.status==='approved'?'completed':'pending';
  const status=x=>group(x)==='completed'?'مكتملة':group(x)==='refunded'?'مسترجعة':'قيد التنفيذ';
  const icon=x=>x.kind==='topup'?'＋':/roblox|robux|روبلوكس|روبوكس/i.test(x.product_name||'')?'◆':/pubg|ببجي/i.test(x.product_name||'')?'🎮':/fortnite|فورت/i.test(x.product_name||'')?'★':'▣';
+ // Show static matching artwork; financial states, totals and transactions are unchanged.
+ const orderArt=x=>{
+   if(x.kind==='topup'&&x.method==='libyana')
+     return {src:'game-covers/order-libyana-premium.webp',name:'ليبيانا',style:'orders-icon-libyana'};
+   if(x.kind==='purchase'&&/roblox|robux|روبلوكس|روبوكس/i.test(x.product_name||''))
+     return {src:'game-covers/order-robux-premium.webp',name:'روبلوكس',style:'orders-icon-robux'};
+   return null;
+ };
  const label=x=>x.kind==='topup'?'شحن '+(x.method==='libyana'?'ليبيانا':'المدار الجديد'):(x.product_name||'طلب شراء');
  const date=x=>new Date(x.created_at).toLocaleDateString('en-GB');
  const tabs='<div class="orders-filter-tabs" role="group" aria-label="تصفية الطلبات"><button class="active" type="button" data-order-filter="all">الكل</button><button type="button" data-order-filter="pending">قيد التنفيذ</button><button type="button" data-order-filter="completed">مكتملة</button><button type="button" data-order-filter="refunded">مسترجعة</button></div>';
@@ -157,7 +165,9 @@ async function renderOrders(){
      product_key:product?.product_key||''
    });
    const contact=manual?'<div class="orders-manual-handover"><p>لتستلم الغرض داخل الماب، لازم تكلم المتجر عبر واتساب أو تيليجرام وتذكر رقم الطلب.</p><button type="button" data-order-contact="'+escapeHtml(x.id)+'">تواصل لاستلام الغرض</button></div>':'';
-   return '<article class="orders-modern-card" data-order-status="'+g+'"><div class="orders-game-icon '+(x.kind==='topup'?'orders-icon-topup':'')+'">'+icon(x)+'</div><div class="orders-card-main"><div class="orders-card-title">'+title+'</div><div class="orders-card-meta">'+date(x)+' · '+details+'</div><div class="orders-card-id">#'+escapeHtml(x.id.slice(0,8).toUpperCase())+'</div>'+note+(codeMap.has(x.id)?'<button type="button" class="btn btn-soft" data-order-code="'+escapeHtml(x.id)+'">🔑 عرض الكود</button>':'')+'</div><div class="orders-card-side"><strong>'+amount+' <small>د.ل</small></strong><span class="orders-status orders-status-'+g+'">'+(g==='completed'?'✓ ':g==='refunded'?'↶ ':'◷ ')+status(x)+'</span></div>'+contact+'</article>';
+   const art=orderArt(x);
+   const orderImage=art?'<img class="orders-product-art" src="'+art.src+'" alt="'+art.name+'" loading="lazy" decoding="async" width="56" height="56">':icon(x);
+   return '<article class="orders-modern-card" data-order-status="'+g+'"><div class="orders-game-icon '+(x.kind==='topup'?'orders-icon-topup ':'')+(art?art.style:'')+'">'+orderImage+'</div><div class="orders-card-main"><div class="orders-card-title">'+title+'</div><div class="orders-card-meta">'+date(x)+' · '+details+'</div><div class="orders-card-id">#'+escapeHtml(x.id.slice(0,8).toUpperCase())+'</div>'+note+(codeMap.has(x.id)?'<button type="button" class="btn btn-soft" data-order-code="'+escapeHtml(x.id)+'">🔑 عرض الكود</button>':'')+'</div><div class="orders-card-side"><strong>'+amount+' <small>د.ل</small></strong><span class="orders-status orders-status-'+g+'">'+(g==='completed'?'✓ ':g==='refunded'?'↶ ':'◷ ')+status(x)+'</span></div>'+contact+'</article>';
  }).join('');
  root.innerHTML=tabs+'<div class="orders-modern-list">'+(cards||'<p class="orders-empty">ما عندكش طلبات حتى الآن.</p>')+'</div><p class="orders-empty orders-filter-empty" hidden>ما فيش طلبات في هذا التصنيف.</p>';
 
