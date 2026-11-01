@@ -1,5 +1,5 @@
 /* GAMEBOXLY — open a complete order menu directly from the Robux card. */
-#robuxModal .robux-checkout-bar{display:none!important}
+html.gb-robux-direct-menu #robuxModal .robux-checkout-bar{display:none!important}
 #robuxModal .robux-package:not(:disabled){cursor:pointer}
 #robuxPurchaseScreen.robux-direct-menu{
   background:radial-gradient(ellipse at 60% 0%,#402a65 0%,#171d37 33%,#0a1020 83%)!important;
