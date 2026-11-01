@@ -52,7 +52,7 @@ const HELP = [
   "الأوامر المختصرة القديمة ما زالت تشتغل: /list /games /add /code /stock /price /rename /on /off /id.",
   "⚠️ تسليم الأكواد الفوري للباقات الرقمية فقط. روبلوكس حاليًا تنفيذ يدوي.",
   "📋 /orders — حالات طلبات الشراء اليدوية، بدون الأكواد الرقمية.",
-  "📨 /sms لرسائل التحويل، /smsbind رقم EMAIL لربط حساب المحوّل مرة واحدة، /smsok رقم لاعتماد رصيده بدون طلب، /smsno رقم للرفض.",
+  "📨 /sms لرسائل ليبيانا، مع أزرار قبول/رفض للتحويلات المطابقة. /smsok رقم و /smsno رقم بدائل يدوية.",
   "🤖 /smsauto status لمعرفة حالة الشحن الآلي، /smsauto off للإيقاف، /smsauto on للتفعيل.",
 ].join("\n");
 
@@ -194,6 +194,69 @@ Deno.serve(async (request: Request) => {
         text: statusLabel,
         show_alert:false
       });
+      return json({ok:true});
+    }
+    // SMS receipt review buttons. A receipt is not itself proof of payment.
+    // Only Telegram's authenticated private admin can authorize this path.
+    const smsChoice=/^sr:([ar]):([1-9][0-9]{0,14})$/.exec(cb.data??"");
+    if(smsChoice){
+      const respondTelegram=async(method:string,body:unknown)=>{
+        try{
+          const reply=await fetch("https://api.telegram.org/bot"+token+"/"+method,{
+            method:"POST",headers:{"content-type":"application/json"},
+            body:JSON.stringify(body)
+          });
+          if(!reply.ok)console.error("sms_receipt_telegram_error",method,reply.status);
+        }catch{console.error("sms_receipt_telegram_unavailable",method)}
+      };
+      const receiptNo=Number(smsChoice[2]);
+      if(!Number.isSafeInteger(receiptNo))return json({ok:true});
+      const databaseUrl=Deno.env.get("SUPABASE_URL")||"";
+      const serviceKey=serviceRoleKey();
+      if(!databaseUrl||!serviceKey){
+        await respondTelegram("answerCallbackQuery",{callback_query_id:cb.id,text:"الخدمة غير جاهزة، حاول لاحقًا",show_alert:true});
+        return json({ok:true});
+      }
+      const db=createClient(databaseUrl,serviceKey,{auth:{persistSession:false,autoRefreshToken:false}});
+      const {data:receipt,error:lookupError}=await db.from("sms_topup_receipts")
+        .select("review_number,status,request_id,amount").eq("review_number",receiptNo).maybeSingle();
+      if(lookupError||!receipt){
+        await respondTelegram("answerCallbackQuery",{callback_query_id:cb.id,text:"رسالة التحويل غير موجودة",show_alert:true});
+        return json({ok:true});
+      }
+      if(receipt.status==="approved"||receipt.status==="rejected"){
+        await respondTelegram("answerCallbackQuery",{callback_query_id:cb.id,text:"تمت مراجعة هذا التحويل سابقًا؛ لا يمكن تكراره",show_alert:true});
+        return json({ok:true});
+      }
+      const approving=smsChoice[1]==="a";
+      if(approving&&(receipt.status!=="matched"||!receipt.request_id)){
+        await respondTelegram("answerCallbackQuery",{callback_query_id:cb.id,text:"لا يمكن القبول: رسالة التحويل غير مطابقة لطلب شحن",show_alert:true});
+        return json({ok:true});
+      }
+      // The existing SQL RPC locks and validates the request, credits once,
+      // and also rejects unmatched receipts without issuing any credit.
+      const {error:reviewError}=await db.rpc("sms_review_topup",{
+        p_review_number:receiptNo,p_decision:approving?"approved":"rejected"
+      });
+      if(reviewError){
+        const already=/receipt_already_reviewed|topup_changed_or_mismatched/i.test(String(reviewError.message||""));
+        await respondTelegram("answerCallbackQuery",{
+          callback_query_id:cb.id,
+          text:already?"التحويل تمت مراجعته أو تغيرت حالة الطلب":"تعذر الاعتماد؛ راجع وصول التحويل وحالة الطلب",
+          show_alert:true
+        });
+        return json({ok:true});
+      }
+      const state=approving?"✅ تم التأكد من التحويل وإضافة الرصيد":"❌ تم رفض التحويل دون إضافة رصيد";
+      const oldText=String(cb.message?.text||"📩 إشعار تحويل ليبيانا #"+receiptNo).slice(0,3400);
+      const amended=/📋 الحالة:[^\n]*/.test(oldText)
+        ?oldText.replace(/📋 الحالة:[^\n]*/,"📋 الحالة: "+state)
+        :oldText+"\n\n📋 الحالة: "+state;
+      await respondTelegram("editMessageText",{
+        chat_id:adminChat,message_id:cb.message?.message_id,
+        text:amended,reply_markup:{inline_keyboard:[]}
+      });
+      await respondTelegram("answerCallbackQuery",{callback_query_id:cb.id,text:state,show_alert:false});
       return json({ok:true});
     }
     const choice = /^wt:([ar]):([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})$/i.exec(cb.data ?? "");
