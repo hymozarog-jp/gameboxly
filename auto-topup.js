@@ -396,8 +396,9 @@
       if(intentError)throw intentError;
       if(!intent?.request_id)throw Error('missing_request');
       currentRequest=intent.request_id;currentAmount=amount;
-      // A USSD intent is not payment evidence. Notify Telegram when the customer
-      // opens the verification view after attempting the carrier transfer.
+      // Notify admin about every newly created or reused USSD request.
+      // This notification is not payment evidence and never credits the wallet.
+      notifyAdminForReview(intent.request_id);
       if(intent.state==='matched'){
         show('ok','وصل إشعار التحويل','وصل إشعار بنفس الرقم والمبلغ، وطلبك بانتظار قرار الإدارة. لا تحوّل المبلغ مرة ثانية.');
         const current=host();
