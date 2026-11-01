@@ -79,7 +79,7 @@
     entries.set(id,item);
     if(item.button)paintButton(item.button);
     item.slowTimer=setTimeout(function(){
-      if(entries.has(id)&&caption&&visible)caption.textContent='الاتصال يتأخر… لا تكرر الدفع أو التحويل';
+      if(entries.has(id)&&caption&&visible)caption.textContent=/شحن|تحويل|دفع|طلب/.test(item.label)?'الاتصال يتأخر… لا تكرر الدفع أو التحويل':'الاتصال يتأخر… جاري المحاولة';
     },14000);
     // The UI never freezes permanently on a lost connection.
     item.timeout=setTimeout(function(){end(id);},65000);
@@ -124,8 +124,8 @@
     if(!img||img.dataset.gbLoadingHooked)return;
     img.dataset.gbLoadingHooked='1';
     var finish=function(){img.classList.remove('gb-image-loading');};
-    img.addEventListener('load',finish,{once:true});
-    img.addEventListener('error',finish,{once:true});
+    img.addEventListener('load',finish);
+    img.addEventListener('error',finish);
     if(!img.complete)img.classList.add('gb-image-loading');
   }
   function imagesIn(node){
