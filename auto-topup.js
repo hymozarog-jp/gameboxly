@@ -124,7 +124,7 @@
     if(data?.status==='approved'){
       root.dataset.state='approved';
       title.textContent='تم الشحن ✓';
-      desc.textContent='تم قبول طلبك من الإدارة وإضافة مبلغ الشحن إلى محفظتك بنجاح.';
+      desc.textContent='تم تأكيد التحويل وإضافة مبلغ الشحن إلى محفظتك بنجاح.';
       foot.textContent='صار الرصيد متاحًا في محفظتك. اضغط «شاهد رصيدك» لمشاهدة حركة الشحن.';
       const goWallet=root.querySelector('.tpv-dismiss');
       if(goWallet)goWallet.textContent='شاهد رصيدك';
@@ -144,9 +144,9 @@
     root.dataset.state='pending';
     title.textContent='جاري التحقق من التحويل';
     if(data?.sms_status==='matched'){
-      desc.textContent='وصل إشعار تحويل مطابق لطلبك. جاري التحقق وننتظر موافقة إدارة المتجر.';
+      desc.textContent='وصل إشعار تحويل مطابق لطلبك. العملية الآن قيد المراجعة؛ لا تكرر التحويل.';
     }else{
-      desc.textContent='ننتظر مطابقة إشعار تحويل ليبيانا وموافقة الإدارة. راح تظهر نتيجة الشحن هنا تلقائيًا.';
+      desc.textContent='ننتظر رسالة تحويل ليبيانا ومطابقتها مع طلبك. سيُضاف الرصيد تلقائيًا فور اعتماد الطلب المؤهل، أو يُحال للمراجعة.';
     }
     foot.textContent='الرجوع من الاتصال لا يؤكد نجاح الدفع. لا تكرر التحويل.';
   }
@@ -274,9 +274,9 @@
         stopWatcher();forgetVerifier();return;
       }
       if(data.sms_status==='matched'){
-        if(status)status.textContent='📩 وصل إشعار تحويل مطابق. ننتظر موافقة الإدارة لإضافة الرصيد.';
+        if(status)status.textContent='📩 وصل إشعار تحويل مطابق. الطلب الآن قيد المراجعة، لا تكرر التحويل.';
       }else if(status){
-        status.textContent='⏳ جاري التحقق من التحويل وانتظار قرار الإدارة. لا تكرر التحويل.';
+        status.textContent='⏳ بانتظار رسالة ليبيانا ومطابقة التحويل. لا تكرر التحويل.';
       }
     }catch(e){
       updateVerifier(id,null,true);
@@ -304,7 +304,7 @@
         refreshBusy=true;
         Promise.resolve(refreshRequest(id)).finally(()=>{refreshBusy=false});
       }
-    },3000);
+    },1800);
   }
   document.addEventListener('visibilitychange',()=>{
     if(document.visibilityState==='visible'&&watcherId&&!refreshBusy)void refreshRequest(watcherId);
