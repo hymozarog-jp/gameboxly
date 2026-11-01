@@ -160,6 +160,24 @@
       ?'القبول التلقائي يتطلب وصول إشعار SMS حقيقي إلى النظام؛ الرجوع من الاتصال ليس إثباتًا للدفع.'
       :'الرجوع من الاتصال لا يؤكد نجاح الدفع. لا تكرر التحويل.';
   }
+  const adminNotified=new Set();
+  const adminNotificationInFlight=new Set();
+  function notifyAdminForReview(id){
+    const key=String(id||'');
+    if(!key||adminNotified.has(key)||adminNotificationInFlight.has(key))return;
+    const db=typeof supabaseClient!=='undefined'?supabaseClient:null;
+    if(!db)return;
+    adminNotificationInFlight.add(key);
+    void db.functions.invoke('l1017n-topup-notify',{body:{request_id:key}})
+      .then(({data,error})=>{
+        if(!error&&data?.ok){
+          adminNotified.add(key);
+        }else{
+          console.warn('[wallet/topup] Admin review notification was not delivered.');
+        }
+      }).catch(()=>console.warn('[wallet/topup] Admin review notification failed.'))
+      .finally(()=>adminNotificationInFlight.delete(key));
+  }
   function showVerifier(id,amount){
     if(!id)return;
     const existing=document.getElementById('tpReturnVerify');
@@ -208,6 +226,8 @@
     root.querySelector('.tpv-refresh').addEventListener('click',()=>refreshRequest(id));
     document.body.appendChild(root);
     document.body.classList.add('tpv-open');
+    // This sends the review choices; it does not credit any wallet.
+    notifyAdminForReview(id);
     root.querySelector('.tpv-title')?.focus({preventScroll:true});
     currentRequest=String(id);
     currentAmount=Number(amount);
@@ -376,11 +396,8 @@
       if(intentError)throw intentError;
       if(!intent?.request_id)throw Error('missing_request');
       currentRequest=intent.request_id;currentAmount=amount;
-      // Notify the store owner in Telegram; never treat intent creation as payment confirmation.
-      void db.functions.invoke('l1017n-topup-notify',{body:{request_id:intent.request_id}})
-        .then(({data,error})=>{
-          if(error||!data?.ok)console.warn('[wallet/topup] Telegram notification pending; request remains reviewable.');
-        }).catch(()=>console.warn('[wallet/topup] Could not notify Telegram.'));
+      // A USSD intent is not payment evidence. Notify Telegram when the customer
+      // opens the verification view after attempting the carrier transfer.
       if(intent.state==='matched'){
         show('ok','وصل إشعار التحويل','وصل إشعار بنفس الرقم والمبلغ. يفحص النظام الطلب تلقائيًا؛ ما تحولش المبلغ مرة ثانية.');
         const current=host();
