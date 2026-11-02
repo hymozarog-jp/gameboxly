@@ -6,7 +6,7 @@
 import { createClient } from "npm:@supabase/supabase-js@2.75.0";
 
 const SITE = "https://hymozarog-jp.github.io";
-const allowedOrigins = new Set([SITE, "http://localhost:5173", "http://127.0.0.1:5500"]);
+const allowedOrigins = new Set([SITE, "https://l1017n.ct.ws", "http://localhost:5173", "http://127.0.0.1:5500"]);
 const json = (body: unknown, status = 200, origin = "") =>
   new Response(JSON.stringify(body), {
     status,
